@@ -6,7 +6,14 @@ namespace ToDoListApp
     class Program
     {
         private static string connectionString = "Server=THANDO-LT\\SQLEXPRESS;Database=ToDoListDB;Trusted_Connection=True;";
-        
+        //my table in my database
+        /*Create Table Tasks(
+         * Id INT Primary Key Identity (1,1),
+         * Title NVARCHAR(100),
+         * TaskDescription NVARCHAR(255),
+         * DueDate DATETIME,
+         * IsCompleted BIT Default 0
+         )*/
         static void Main(string[] args)
         {
             int choice;
@@ -27,10 +34,13 @@ namespace ToDoListApp
                     case 1: 
                         AddTask();
                         break;
+                    case 2:
+                        ViewTasks();
+                        break;
 
                 }
 
-            }while (choice != 5);
+            } while (choice != 5);
         }
 
         static void AddTask()
@@ -58,6 +68,23 @@ namespace ToDoListApp
             }
 
             Console.WriteLine("Task Added Successfully");
+        }
+
+        static void ViewTasks()
+        {
+            using (SqlConnection  connection = new SqlConnection (connectionString))
+            {
+                string query = "SELECT * FROM TASKS";
+                SqlCommand cmd = new SqlCommand(query, connection);
+                connection.Open();
+
+                SqlDataReader reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    Console.WriteLine($"ID: {reader["Id"]}, Title: {reader["Title"]}, Description: {reader["TaskDescription"]}, DueDate: {reader["DueDate"]}, Is Completed: {reader["IsCompleted"]}");
+                }
+                connection.Close();
+            }
         }
     }
 
