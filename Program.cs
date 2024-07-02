@@ -37,6 +37,12 @@ namespace ToDoListApp
                     case 2:
                         ViewTasks();
                         break;
+                    case 3:
+                        UpdateTasks(); 
+                        break;
+                    case 4:
+                        DeleteTask();
+                        break;
 
                 }
 
@@ -86,6 +92,56 @@ namespace ToDoListApp
                 connection.Close();
             }
         }
+
+        static void UpdateTasks()
+        {
+            Console.Write("Enter Task ID to update");
+            int id = int.Parse(Console.ReadLine());
+
+            Console.Write("Enter new title: ");
+            string title = Console.ReadLine();
+            Console.Write("Enter new description: ");
+            string description = Console.ReadLine();
+            Console.Write("Enter New Due Date (yyyy-mm-dd): ");
+            DateTime dueDate = DateTime.Parse(Console.ReadLine());
+            Console.Write("Is the task completed? (yes/no): ");
+            bool isCompleted = Console.ReadLine().ToLower() == "yes";
+            using (SqlConnection conn = new SqlConnection (connectionString))
+            {
+                string query = "UPDATE Tasks SET Title = @Title, TaskDescription = @TaskDescription, DueDate = @DueDate, IsCompleted = @IsCompleted WHERE Id = @Id";
+                SqlCommand cmd = new SqlCommand (query, conn);
+                cmd.Parameters.AddWithValue("@Id", id);
+                cmd.Parameters.AddWithValue("@Title", title);
+                cmd.Parameters.AddWithValue("@TaskDescription", description);
+                cmd.Parameters.AddWithValue("@DueDate", dueDate);
+                cmd.Parameters.AddWithValue("@IsCompleted", isCompleted);
+
+                conn.Open();
+                cmd.ExecuteNonQuery();
+                conn.Close();
+            }
+            Console.WriteLine("Task updated successfully");
+        }
+
+        static void DeleteTask()
+        {
+            Console.WriteLine("Enter task ID to delete: ");
+            int id = int.Parse(Console.ReadLine());
+
+            using (SqlConnection connection = new SqlConnection (connectionString))
+            {
+                string query = "DELETE FROM Tasks WHERE Id = @Id";
+                SqlCommand cmd = new SqlCommand(query, connection);
+                cmd.Parameters.AddWithValue("@Id", id);
+
+                connection.Open();
+                cmd.ExecuteNonQuery();
+                connection.Close();
+            }
+            Console.WriteLine("Task deleted successfully");
+        }
+
+
     }
 
 }
